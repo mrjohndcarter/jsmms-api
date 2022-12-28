@@ -1,0 +1,142 @@
+openapi: "3.0.0"
+info:
+    version: "0.0.1"
+    title: "Material Management API"
+    description: Manage and query stored materials
+
+paths:
+    /material/{materialID}:
+        parameters:
+            - name: materialID
+              description: The unique identifier of the material
+              in: path
+              required: true
+              schema:
+                  $ref: "#/components/schemas/MaterialID"
+        get:
+            summary: Get the attributes of the specified material
+            responses:
+                404:
+                    description: No material found for the provided `materialId`
+                    content:
+                        application/json:
+                            schema:
+                                $ref: "#/components/schemas/Error"
+                "200":
+                    description: Return material
+                    content:
+                        application/json:
+                            schema:
+                                $ref: "#/components/schemas/Material"
+        put:
+            summary: Update attributes for specified material
+            requestBody:
+                description: Material to create
+                required: true
+                content:
+                    application/json:
+                        schema:
+                            $ref: "#/components/schemas/Material"
+            responses:
+                404:
+                    description: No material found for the provided `materialId`
+                    content:
+                        application/json:
+                            schema:
+                                $ref: "#/components/schemas/Error"
+                "200":
+                    description: Add or change a material type
+                    content:
+                        application/json:
+                            schema:
+                                $ref: "#/components/schemas/Material"
+        delete:
+            summary: Remove material
+            responses:
+                "404":
+                    description: No material found for the provided `materialId`
+                    content:
+                        application/json:
+                            schema:
+                                $ref: "#/components/schemas/Error"
+                "200":
+                    description: Remove a material type
+                    content:
+                        application/json:
+                            schema:
+                                $ref: "#/components/schemas/Material"
+    /material:
+        get:
+            summary: List materials
+            parameters:
+                - in: query
+                  required: false
+                  name: offset
+                  schema:
+                      type: integer
+                      description: Number of items to skip in the result set
+                - in: query
+                  required: false
+                  name: limit
+                  schema:
+                      type: integer
+                      description: Number of items to return
+            responses:
+                "200":
+                    description: List materials
+                    content:
+                        application/json:
+                            schema:
+                                type: array
+                                items:
+                                    $ref: "#/components/schemes/Material"
+        post:
+            summary: Add material
+            requestBody:
+                description: Material to create
+                required: true
+                content:
+                    application/json:
+                        schema:
+                            $ref: "#/components/schemas/Material"
+            responses:
+                "201":
+                    description: Created
+                    content:
+                        application/json:
+                            schema:
+                                $ref: "#/components/schemas/Material"
+
+components:
+    schemas:
+        Material:
+            description: Data about a specific material
+            type: object
+            required:
+                - names
+                - type
+            properties:
+                id:
+                    $ref: "#/components/schemas/MaterialId"
+                names:
+                    type: array
+                    items:
+                        type: string
+                type:
+                    type: string
+                    enum:
+                        - solid
+                        - engineered
+                description:
+                    type: string
+        MaterialId:
+            description: The unique identifier for a specific material.
+            type: integer
+        Error:
+            type: object
+            required:
+                - message
+            properties:
+                message:
+                    description: A human readable error message
+                    type: string
